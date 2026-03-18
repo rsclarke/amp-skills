@@ -1,11 +1,11 @@
 ---
 name: addressing-github-issues
-description: Addresses GitHub issues end-to-end. Creates a conventional branch, reviews related code, and implements the fix or feature. Use when given an issue number to work on.
+description: Addresses GitHub issues end-to-end. Fetches issue context, creates a working branch, and implements the fix or feature. Use when given an issue number to work on.
 ---
 
 # Addressing GitHub Issues
 
-Takes a GitHub issue number and works through it end-to-end: creates a branch, understands the context, and implements the solution.
+Takes a GitHub issue number and works through it end-to-end: fetches context, creates a working branch, and implements the solution.
 
 ## Prerequisites
 
@@ -26,35 +26,14 @@ Parse the response to understand:
 - Any acceptance criteria
 - Relevant labels (bug, feature, enhancement, etc.)
 
-### 2. Create a Conventional Branch
+### 2. Create the Working Branch
 
-Branch naming follows the [Conventional Branch](https://conventional-branch.github.io/) specification:
+Use the `creating-conventional-branches` skill with the issue details from Step 1 (number, title, and labels).
 
-**Format**: `<prefix>/<issue-number>-<description>`
-
-**Prefixes based on issue type**:
-- `feature/` or `feat/` - New features (label: `enhancement`, `feature`)
-- `fix/` or `bugfix/` - Bug fixes (label: `bug`)
-- `hotfix/` - Urgent production fixes (label: `critical`, `urgent`)
-- `chore/` - Non-code tasks like docs, dependencies (label: `documentation`, `chore`, `dependencies`)
-
-**Rules**:
-- Use lowercase letters, numbers, and hyphens only
-- No consecutive, leading, or trailing hyphens
-- Keep descriptions concise but clear
-
-**Examples**:
-```bash
-git checkout -b feat/123-add-user-authentication
-git checkout -b fix/456-resolve-login-timeout
-git checkout -b chore/789-update-readme
-```
-
-Determine the prefix from the issue labels. Default to `feat/` if unclear.
-
-```bash
-git checkout -b <prefix>/<issue-number>-<short-description>
-```
+At minimum, ensure the branch includes:
+- A conventional prefix (for example `feat/`, `fix/`, `chore/`)
+- The issue number
+- A concise description slug
 
 ### 3. Review Related Code
 
@@ -96,19 +75,6 @@ After completing the work, provide:
 - Files modified
 - Tests added/updated
 - Any follow-up items or considerations
-
-## Label to Prefix Mapping
-
-| Labels | Prefix |
-|--------|--------|
-| `enhancement`, `feature`, `feat` | `feat/` |
-| `bug`, `defect` | `fix/` |
-| `critical`, `urgent`, `hotfix` | `hotfix/` |
-| `documentation`, `docs` | `chore/` |
-| `dependencies`, `deps` | `chore/` |
-| `chore`, `maintenance` | `chore/` |
-| `release` | `release/` |
-| (no matching labels) | `feat/` |
 
 ## Notes
 
