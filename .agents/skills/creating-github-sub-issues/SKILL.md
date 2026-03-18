@@ -22,18 +22,16 @@ gh issue create \
   --body "Description of the parent issue..."
 ```
 
-Note the issue URL returned (e.g., `https://github.com/owner/repo/issues/27`).
+Note the issue URL returned (e.g., `https://github.com/owner/repo/issues/27`). Keep the parent body focused on scope/context; do not append sub-issue IDs or checklists.
 
 ### 2. Create Sub-Issues
 
-Create each sub-issue with a reference to the parent in the body:
+Create each sub-issue with only its own description:
 
 ```bash
 gh issue create \
   --title "Sub-issue title" \
-  --body "Description...
-
-Parent issue: #27"
+  --body "Description..."
 ```
 
 ### 3. Link Sub-Issues to Parent
@@ -106,3 +104,5 @@ gh api repos/OWNER/REPO/issues/28/parent
 - Up to 8 levels of nested sub-issues
 - The deprecated `[tasklist]` markdown syntax does not create proper parent-child relationships
 - Issue IDs are different from issue numbers; use the API to get the ID
+- Do not add `Parent issue: #...` in sub-issue bodies when using the API relationship; GitHub already shows the parent in the UI
+- Do not maintain sub-issue checklists or ID lists in the parent body; linked sub-issues are already shown in the parent
