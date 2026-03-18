@@ -56,16 +56,9 @@ Follow the project's established patterns:
 
 ### 5. Commit with Conventional Commits
 
-Use [Conventional Commits](https://www.conventionalcommits.org/) format:
+Use the `creating-conventional-commits` skill to commit each logical change as work progresses.
 
-```bash
-git add .
-git commit -m "<type>: <description>
-
-Closes #ISSUE_NUMBER"
-```
-
-**Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+When the issue is fully resolved, ensure commit footers include the appropriate reference (for example `Closes #ISSUE_NUMBER` or `Fixes #ISSUE_NUMBER`).
 
 ### 6. Summary
 
