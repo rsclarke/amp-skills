@@ -9,7 +9,6 @@ Creates Git commits that follow the [Conventional Commits 1.0.0](https://www.con
 
 ## Prerequisites
 
-- Git repository with write access
 - A clear logical unit of work ready to commit
 - Staged changes, or intent to stage specific files
 
