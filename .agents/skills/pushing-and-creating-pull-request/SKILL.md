@@ -9,8 +9,6 @@ Pushes the current branch to the remote and creates a pull request with a well-s
 
 ## Prerequisites
 
-- `gh` CLI installed and authenticated (`gh auth status`)
-- Repository write access
 - At least one commit on the current branch ahead of the base branch
 
 ## Workflow
@@ -18,13 +16,11 @@ Pushes the current branch to the remote and creates a pull request with a well-s
 ### 1. Verify State
 
 ```bash
-gh auth status
 git status
 git branch --show-current
 ```
 
 Confirm:
-- Authenticated with GitHub
 - Working directory is clean (no uncommitted changes)
 - On the correct feature branch (not `main`)
 
@@ -124,8 +120,6 @@ After creating the PR, provide:
 
 ## Notes
 
-- Always check `gh auth status` before starting
-- Verify you're on the correct repository with `gh repo view`
 - If the working directory has uncommitted changes, prompt the user before proceeding
 - When there are multiple commits, read all of them before composing the description — do not base the PR solely on the first or last commit
 - Escape special characters in the `--body` argument to avoid shell interpretation issues

@@ -7,11 +7,6 @@ description: Creates GitHub issues with parent-child relationships using the gh 
 
 Creates GitHub issues with proper parent-child relationships visible in the GitHub UI sidebar.
 
-## Prerequisites
-
-- `gh` CLI installed and authenticated (`gh auth status`)
-- Repository write access
-
 ## Workflow
 
 ### 1. Create the Parent Issue

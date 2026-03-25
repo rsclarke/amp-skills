@@ -9,8 +9,6 @@ Takes a GitHub issue number and works through it end-to-end: fetches context, cr
 
 ## Prerequisites
 
-- `gh` CLI installed and authenticated (`gh auth status`)
-- Repository write access
 - Clean git working directory (or stash uncommitted changes)
 
 ## Workflow
@@ -71,6 +69,4 @@ After completing the work, provide:
 
 ## Notes
 
-- Always check `gh auth status` before starting
-- Verify you're on the correct repository with `gh repo view`
 - If the working directory is dirty, prompt the user before proceeding

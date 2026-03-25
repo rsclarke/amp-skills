@@ -9,7 +9,6 @@ Creates a new Git branch using the [Conventional Branch](https://conventional-br
 
 ## Prerequisites
 
-- Git repository with write access
 - Branch naming context (issue number, ticket number, or short task description)
 - Clean git working directory, or explicit user approval to proceed with local changes
 
