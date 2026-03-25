@@ -57,15 +57,11 @@ The title should match the primary conventional commit type of the work.
 
 ### 5. Compose PR Description
 
-Structure the body with these sections:
+Structure the body as follows:
 
 ```markdown
-## Summary
-
 A concise paragraph explaining what this PR does and why. Derived from
 the issue context (motivation/reason for change) and commit messages.
-
-## Changes
 
 - First change derived from commit messages
 - Second change derived from commit messages
@@ -74,21 +70,21 @@ the issue context (motivation/reason for change) and commit messages.
 Closes #N
 ```
 
-**Rules for composing each section:**
+**Rules for composing each part:**
 
-#### Summary
+#### Summary paragraph
 - Explain **what** changed and **why** (the motivation)
 - If an issue is referenced, incorporate its context for the "why"
 - Keep to 2–3 sentences
 
-#### Changes
+#### Changes list
 - One bullet per logical change
 - For a **single commit**: derive bullets from the commit body, or summarize the diff if the body is sparse
 - For **multiple commits**: one bullet per commit, using the commit subject (strip the conventional commit prefix for readability)
 - Group related commits if they address the same concern
 
 #### Issue References
-- Place `Closes #N` or `Fixes #N` at the end of the body (not in the summary)
+- Place `Closes #N` or `Fixes #N` at the end of the body (not in the summary paragraph)
 - Use `Closes` for issues fully resolved by the PR
 - Use `Refs #N` for issues that are related but not fully resolved
 - Collect references from all commits and the branch name
