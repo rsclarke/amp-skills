@@ -23,14 +23,39 @@ git branch --show-current
 
 If the working directory is dirty, ask the user before creating the branch.
 
-### 2. Gather Branch Inputs
+### 2. Switch to the Up-to-Date Default Branch
+
+Detect the remote default branch:
+
+```bash
+git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
+```
+
+If the command fails (e.g., `origin/HEAD` is not set), fix it first:
+
+```bash
+git remote set-head origin --auto
+```
+
+Then checkout the default branch and pull latest:
+
+```bash
+git checkout <default-branch>
+git pull origin <default-branch>
+```
+
+If the current branch is already the default branch, just pull.
+
+If the user explicitly asks to branch from a different base, skip this step.
+
+### 3. Gather Branch Inputs
 
 Collect:
 - **Issue or ticket number** (if available)
 - **Short description** from the issue title or task summary
 - **Type signal** from labels or request language (bug, feature, docs, etc.)
 
-### 3. Select Branch Prefix
+### 4. Select Branch Prefix
 
 Use this mapping:
 
@@ -45,7 +70,7 @@ Use this mapping:
 | `release` | `release/` |
 | (no matching signals) | `feat/` |
 
-### 4. Build the Description Slug
+### 5. Build the Description Slug
 
 Normalize the description to match the spec:
 - Lowercase only
@@ -55,7 +80,7 @@ Normalize the description to match the spec:
 - Trim leading/trailing hyphens
 - Keep concise and clear
 
-### 5. Compose the Branch Name
+### 6. Compose the Branch Name
 
 Use one of these formats:
 
@@ -70,7 +95,7 @@ fix/456-resolve-login-timeout
 chore/update-readme-links
 ```
 
-### 6. Create and Verify
+### 7. Create and Verify
 
 ```bash
 git checkout -b <branch-name>
