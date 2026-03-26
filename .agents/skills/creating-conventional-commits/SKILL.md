@@ -33,6 +33,12 @@ Preview the changes for the intended files:
 git diff HEAD -- <files>
 ```
 
+If any of the intended files are **untracked** (shown as `??` in `git status`), stage only those files first so git recognises them:
+
+```bash
+git add <untracked files from the change set>
+```
+
 ### 3. Choose the Commit Type
 
 Use these conventional types based on intent:
