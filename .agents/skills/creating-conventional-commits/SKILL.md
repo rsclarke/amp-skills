@@ -10,7 +10,7 @@ Creates Git commits that follow the [Conventional Commits 1.0.0](https://www.con
 ## Prerequisites
 
 - A clear logical unit of work ready to commit
-- Staged changes, or intent to stage specific files
+- Known list of files to include in the commit
 
 ## Workflow
 
@@ -23,16 +23,15 @@ git branch --show-current
 
 Confirm you are on the intended branch and understand which files are modified before staging.
 
-### 2. Stage a Logical Change Set
+### 2. Identify the Logical Change Set
 
-Stage only files that belong to one coherent change:
+Determine which files belong to this commit. If the work contains unrelated edits, split them into separate commits.
+
+Preview the changes for the intended files:
 
 ```bash
-git add <files>
-git diff --staged
+git diff HEAD -- <files>
 ```
-
-If the work contains unrelated edits, split them into separate commits.
 
 ### 3. Choose the Commit Type
 
@@ -68,15 +67,17 @@ Guidelines:
 
 ### 5. Commit and Verify
 
+Commit only the intended files by passing them directly to `git commit`. This avoids accidentally including unrelated changes that may already be in the index:
+
 ```bash
-git commit -m "<type>: <summary>"
+git commit <files> -m "<type>: <summary>"
 git log -1 --format="%h %s"
 ```
 
 For body and footers, prefer multiple `-m` flags:
 
 ```bash
-git commit -m "fix(auth): handle expired refresh token" \
+git commit <files> -m "fix(auth): handle expired refresh token" \
   -m "Rejects malformed refresh payloads before token verification." \
   -m "Fixes #123"
 ```
