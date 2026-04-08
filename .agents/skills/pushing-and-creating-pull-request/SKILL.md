@@ -60,8 +60,7 @@ The title should match the primary conventional commit type of the work.
 Structure the body as follows:
 
 ```markdown
-A concise paragraph explaining what this PR does and why. Derived from
-the issue context (motivation/reason for change) and commit messages.
+A concise paragraph explaining what this PR does and why. Derived from the issue context (motivation/reason for change) and commit messages.
 
 - First change derived from commit messages
 - Second change derived from commit messages
@@ -72,10 +71,13 @@ Closes #N
 
 **Rules for composing each part:**
 
+> **Important**: Do NOT insert hard line breaks (newlines) within a paragraph or bullet point. Each paragraph and each bullet item must be a single unwrapped line. GitHub Markdown treats mid-paragraph newlines as literal line breaks, producing awkward formatting. Let the GitHub UI handle text wrapping.
+
 #### Summary paragraph
 - Explain **what** changed and **why** (the motivation)
 - If an issue is referenced, incorporate its context for the "why"
 - Keep to 2–3 sentences
+- Write each sentence on the same line — no mid-paragraph newlines
 
 #### Changes list
 - One bullet per logical change
