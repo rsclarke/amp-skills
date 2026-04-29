@@ -14,14 +14,18 @@ Creates Git commits that follow the [Conventional Commits 1.0.0](https://www.con
 
 ## Workflow
 
-### 1. Verify Repository State
+### 1. Preflight
+
+If a calling skill already verified state in this run, skip the `git status --short --branch` invocation but still apply the untracked-file rule in §2.
 
 ```bash
-git status --short
-git branch --show-current
+git status --short --branch
 ```
 
-Confirm you are on the intended branch and understand which files are modified before staging.
+- **None** — nothing to commit; stop
+- **Any `M A D R C`** — proceed to §2
+- **Any `??`** — proceed to §2; intended untracked files are staged there
+- **Any `U` / `AA` / `DD`** — stop; resolve before committing
 
 ### 2. Identify the Logical Change Set
 
@@ -33,10 +37,10 @@ Preview the changes for the intended files:
 git diff HEAD -- <files>
 ```
 
-If any of the intended files are **untracked** (shown as `??` in `git status`), stage only those files first so git recognises them:
+If any of the intended files are **untracked** (`??` in `git status`), stage **only those specific files** first so git recognises them — do not run a bare `git add` or `git add .`:
 
 ```bash
-git add <untracked files from the change set>
+git add <intended untracked files only>
 ```
 
 ### 3. Choose the Commit Type
