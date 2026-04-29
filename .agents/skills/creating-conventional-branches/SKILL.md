@@ -31,26 +31,11 @@ git status --short --branch
 
 ### 2. Switch to the Up-to-Date Default Branch
 
-Detect the remote default branch:
-
 ```bash
-git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
+git fetch origin && git checkout $(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo main) && git pull --ff-only
 ```
 
-If the command fails (e.g., `origin/HEAD` is not set), fix it first:
-
-```bash
-git remote set-head origin --auto
-```
-
-Then checkout the default branch and pull latest:
-
-```bash
-git checkout <default-branch>
-git pull origin <default-branch>
-```
-
-If the current branch is already the default branch, just pull.
+If `origin/HEAD` is not set, run `git remote set-head origin --auto` once before retrying.
 
 If the user explicitly asks to branch from a different base, skip this step.
 
@@ -78,13 +63,7 @@ Use this mapping:
 
 ### 5. Build the Description Slug
 
-Normalize the description to match the spec:
-- Lowercase only
-- Keep letters, numbers, and hyphens
-- Replace spaces/underscores with hyphens
-- Collapse repeated hyphens
-- Trim leading/trailing hyphens
-- Keep concise and clear
+Lowercase, alphanumerics + hyphens only; collapse and trim hyphens; keep concise.
 
 ### 6. Compose the Branch Name
 
@@ -101,18 +80,13 @@ fix/456-resolve-login-timeout
 chore/update-readme-links
 ```
 
-### 7. Create and Verify
+### 7. Create
 
 ```bash
 git checkout -b <branch-name>
-git branch --show-current
 ```
 
-If the branch already exists, check it out instead:
-
-```bash
-git checkout <branch-name>
-```
+If the branch already exists, check it out instead with `git checkout <branch-name>`.
 
 ## Notes
 
