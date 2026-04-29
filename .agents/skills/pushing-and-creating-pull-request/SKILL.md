@@ -13,16 +13,22 @@ Pushes the current branch to the remote and creates a pull request with a well-s
 
 ## Workflow
 
-### 1. Verify State
+### 1. Preflight
+
+If a calling skill already verified state in this run, skip.
+
+Otherwise:
 
 ```bash
-git status
-git branch --show-current
+git status --short --branch
 ```
 
-Confirm:
-- Working directory is clean (no uncommitted changes)
-- On the correct feature branch (not `main`)
+- **None** — proceed (clean)
+- **Only `??`** — warn the user; they will not be pushed. Proceed only with approval
+- **Any `M A D R C`** — stop; commit (via `creating-conventional-commits`) or stash before pushing
+- **Any `U` / `AA` / `DD`** — stop; resolve before pushing
+
+Also confirm the current branch is **not** the default branch before pushing.
 
 ### 2. Gather Commit History
 

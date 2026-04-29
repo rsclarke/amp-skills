@@ -14,14 +14,20 @@ Creates a new Git branch using the [Conventional Branch](https://conventional-br
 
 ## Workflow
 
-### 1. Verify Repository State
+### 1. Preflight
+
+If a calling skill already verified state in this run, skip.
+
+Otherwise:
 
 ```bash
-git status --short
-git branch --show-current
+git status --short --branch
 ```
 
-If the working directory is dirty, ask the user before creating the branch.
+- **None** — proceed (clean)
+- **Only `??`** — proceed (untracked files survive `git checkout -b`)
+- **Any `M A D R C`** — stop and ask the user before creating a branch
+- **Any `U` / `AA` / `DD`** — stop; resolve before branching
 
 ### 2. Switch to the Up-to-Date Default Branch
 
