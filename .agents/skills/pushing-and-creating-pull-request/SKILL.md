@@ -63,39 +63,20 @@ The title should match the primary conventional commit type of the work.
 
 ### 5. Compose PR Description
 
-Structure the body as follows:
+Structure:
 
 ```markdown
-A concise paragraph explaining what this PR does and why. Derived from the issue context (motivation/reason for change) and commit messages.
+A 2–3 sentence paragraph explaining what changed and why, drawing motivation from the referenced issue.
 
-- First change derived from commit messages
-- Second change derived from commit messages
-- Additional changes as needed
+- One bullet per logical change (single commit → derive from body/diff; multiple commits → one bullet per commit, prefix stripped)
+- Group related commits
 
 Closes #N
 ```
 
-**Rules for composing each part:**
-
-> **Important**: Do NOT insert hard line breaks (newlines) within a paragraph or bullet point. Each paragraph and each bullet item must be a single unwrapped line. GitHub Markdown treats mid-paragraph newlines as literal line breaks, producing awkward formatting. Let the GitHub UI handle text wrapping.
-
-#### Summary paragraph
-- Explain **what** changed and **why** (the motivation)
-- If an issue is referenced, incorporate its context for the "why"
-- Keep to 2–3 sentences
-- Write each sentence on the same line — no mid-paragraph newlines
-
-#### Changes list
-- One bullet per logical change
-- For a **single commit**: derive bullets from the commit body, or summarize the diff if the body is sparse
-- For **multiple commits**: one bullet per commit, using the commit subject (strip the conventional commit prefix for readability)
-- Group related commits if they address the same concern
-
-#### Issue References
-- Place `Closes #N` or `Fixes #N` at the end of the body (not in the summary paragraph)
-- Use `Closes` for issues fully resolved by the PR
-- Use `Refs #N` for issues that are related but not fully resolved
-- Collect references from all commits and the branch name
+Rules:
+- Never insert newlines inside a paragraph or bullet — each is one unwrapped line. GitHub renders mid-paragraph newlines as literal breaks.
+- Use `Closes`/`Fixes` for fully resolved issues, `Refs` otherwise. Place at end of body, collected from all commits and the branch name.
 
 ### 6. Push and Create the PR
 
@@ -104,13 +85,7 @@ git push -u origin HEAD
 gh pr create --title "<title>" --body "<body>"
 ```
 
-### 7. Summary
-
-After creating the PR, provide:
-- PR URL (from `gh pr create` output)
-- PR title
-- Issues referenced
-- Number of commits included
+Escape special characters in `--body` for the shell.
 
 ## Conventional Commit Type to PR Title Mapping
 
@@ -118,10 +93,4 @@ After creating the PR, provide:
 - All `fix` → `fix:`
 - All `docs` → `docs:`
 - All `chore` → `chore:`
-- Mixed types → use the prefix of the primary/most significant type
-
-## Notes
-
-- If the working directory has uncommitted changes, prompt the user before proceeding
-- When there are multiple commits, read all of them before composing the description — do not base the PR solely on the first or last commit
-- Escape special characters in the `--body` argument to avoid shell interpretation issues
+- Mixed types → prefix of the primary type

@@ -29,15 +29,13 @@ git status --short --branch
 
 ### 2. Identify the Logical Change Set
 
-Determine which files belong to this commit. If the work contains unrelated edits, split them into separate commits.
-
-Preview the changes for the intended files:
+Pick the files for one logical commit; split unrelated edits into separate commits.
 
 ```bash
 git diff HEAD -- <files>
 ```
 
-If any of the intended files are **untracked** (`??` in `git status`), stage **only those specific files** first so git recognises them — do not run a bare `git add` or `git add .`:
+For untracked files (`??`), stage only the intended ones — never `git add .`:
 
 ```bash
 git add <intended untracked files only>
@@ -75,27 +73,19 @@ Guidelines:
 
 ### 5. Commit and Verify
 
-Commit only the intended files by passing them directly to `git commit`. This avoids accidentally including unrelated changes that may already be in the index:
-
-```bash
-git commit <files> -m "<type>: <summary>"
-git log -1 --format="%h %s"
-```
-
-For body and footers, prefer multiple `-m` flags:
+Pass intended files directly to `git commit` to avoid pulling in unrelated staged changes. Use multiple `-m` flags for body and footers.
 
 ```bash
 git commit <files> -m "fix(auth): handle expired refresh token" \
   -m "Rejects malformed refresh payloads before token verification." \
   -m "Fixes #123"
+git log -1 --format="%h %s"
 ```
 
 ### 6. Continue During Ongoing Work
 
-Repeat this process as implementation progresses, committing each logical step separately instead of batching all changes into one large commit.
+Commit each logical step as work progresses; do not batch.
 
 ## Notes
 
-- Make commits incrementally throughout implementation to preserve reviewable history.
-- Do not mix unrelated concerns in the same commit.
-- This skill is intended to be used directly, or as a sub-step inside `addressing-github-issues`.
+- Usable directly or as a sub-step inside `addressing-github-issues`.
