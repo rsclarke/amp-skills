@@ -61,7 +61,7 @@ Use this mapping:
 
 ### 5. Build the Description Slug
 
-Lowercase, alphanumerics + hyphens only; collapse and trim hyphens; keep concise.
+Lowercase, alphanumerics + hyphens only; 3–8 words.
 
 ### 6. Compose the Branch Name
 
@@ -88,6 +88,5 @@ If the branch already exists, check it out instead with `git checkout <branch-na
 
 ## Notes
 
-- Prefer issue number in the branch name when available for traceability.
-- Keep branch descriptions short (typically 3-8 words) while preserving intent.
-- This skill is intended to be used directly, or as a sub-step inside `addressing-github-issues`.
+- Prefer issue number in the branch name when available.
+- Usable directly or as a sub-step inside `addressing-github-issues`.
