@@ -47,15 +47,13 @@ git add <intended untracked files only>
 
 Use these conventional types based on intent:
 
-| Change Intent | Type |
-|---------------|------|
-| New user-facing behavior | `feat` |
-| Bug fix or regression fix | `fix` |
-| Documentation-only update | `docs` |
-| Formatting-only (no logic change) | `style` |
-| Internal restructuring without behavior change | `refactor` |
-| Test additions or test-only updates | `test` |
-| Tooling, maintenance, or dependency work | `chore` |
+- `feat` — new user-facing behavior
+- `fix` — bug fix or regression fix
+- `docs` — documentation-only update
+- `style` — formatting-only (no logic change)
+- `refactor` — internal restructuring without behavior change
+- `test` — test additions or test-only updates
+- `chore` — tooling, maintenance, or dependency work
 
 ### 4. Compose the Commit Message
 

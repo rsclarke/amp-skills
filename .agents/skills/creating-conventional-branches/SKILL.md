@@ -50,16 +50,14 @@ Collect:
 
 Use this mapping:
 
-| Labels / Signals | Prefix |
-|------------------|--------|
-| `enhancement`, `feature`, `feat` | `feat/` |
-| `bug`, `defect` | `fix/` |
-| `critical`, `urgent`, `hotfix` | `hotfix/` |
-| `documentation`, `docs` | `chore/` |
-| `dependencies`, `deps` | `chore/` |
-| `chore`, `maintenance` | `chore/` |
-| `release` | `release/` |
-| (no matching signals) | `feat/` |
+- `enhancement`, `feature`, `feat` → `feat/`
+- `bug`, `defect` → `fix/`
+- `critical`, `urgent`, `hotfix` → `hotfix/`
+- `documentation`, `docs` → `chore/`
+- `dependencies`, `deps` → `chore/`
+- `chore`, `maintenance` → `chore/`
+- `release` → `release/`
+- (no matching signals) → `feat/`
 
 ### 5. Build the Description Slug
 
