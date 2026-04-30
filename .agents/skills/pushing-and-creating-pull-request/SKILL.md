@@ -114,13 +114,11 @@ After creating the PR, provide:
 
 ## Conventional Commit Type to PR Title Mapping
 
-| Commit Types in Branch | PR Title Prefix |
-|------------------------|-----------------|
-| All `feat` | `feat:` |
-| All `fix` | `fix:` |
-| All `docs` | `docs:` |
-| All `chore` | `chore:` |
-| Mixed types | Use the prefix of the primary/most significant type |
+- All `feat` → `feat:`
+- All `fix` → `fix:`
+- All `docs` → `docs:`
+- All `chore` → `chore:`
+- Mixed types → use the prefix of the primary/most significant type
 
 ## Notes
 
