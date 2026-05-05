@@ -16,9 +16,7 @@ Creates a new Git branch using the [Conventional Branch](https://conventional-br
 
 ### 1. Preflight
 
-If a calling skill already verified state in this run, skip.
-
-Otherwise:
+Skip the `git status` call only when a coordinator preflighted **immediately before** invoking this skill **and no file-changing step has run since**. Otherwise:
 
 ```bash
 git status --short --branch
@@ -55,16 +53,11 @@ Collect:
 
 ### 4. Select Branch Prefix
 
-Use this mapping:
-
-- `enhancement`, `feature`, `feat` → `feat/`
-- `bug`, `defect` → `fix/`
-- `critical`, `urgent`, `hotfix` → `hotfix/`
-- `documentation`, `docs` → `chore/`
-- `dependencies`, `deps` → `chore/`
-- `chore`, `maintenance` → `chore/`
-- `release` → `release/`
-- (no matching signals) → `feat/`
+- `fix/` — bugs, defects
+- `hotfix/` — critical or urgent production fixes
+- `chore/` — docs, dependencies, tooling, maintenance
+- `release/` — release branches
+- `feat/` — everything else (default, including new features and enhancements)
 
 ### 5. Build the Description Slug
 
