@@ -26,18 +26,28 @@ git status --short --branch
 - **Any `M A D R C`** — stop; commit (via `creating-conventional-commits`) or stash before pushing
 - **Any `U` / `AA` / `DD`** — stop; resolve before pushing
 
-Also confirm the current branch is **not** the default branch before pushing.
+Resolve the default branch and confirm the current branch is not it:
+
+```bash
+DEFAULT=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null)
+DEFAULT=${DEFAULT#origin/}
+DEFAULT=${DEFAULT:-main}
+CURRENT=$(git symbolic-ref --short HEAD)
+[ "$CURRENT" != "$DEFAULT" ] || { echo "Refusing to push from default branch ($CURRENT)"; exit 1; }
+```
+
+If `origin/HEAD` is unset (e.g., on manually-added remotes or after a default-branch rename), run `git remote set-head origin --auto` once before retrying — the silent `main` fallback may otherwise produce a wrong-base PR.
 
 ### 2. Gather Commit History
 
-Resolve the base branch dynamically (defaults to `origin/main` if `origin/HEAD` is unset) and collect commits ahead of it:
+Reuse `$DEFAULT` from step 1 to collect commits ahead of the base branch:
 
 ```bash
-BASE=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo origin/main)
+BASE="origin/$DEFAULT"
 git log "$BASE"..HEAD --reverse --format="%h %s%n%n%b"
 ```
 
-Reuse `$BASE` for any later range queries. For PRs targeting a non-default base, the caller should specify it explicitly via `gh pr create --base <branch>` in step 6.
+For PRs targeting a non-default base, the caller should specify it explicitly via `gh pr create --base <branch>` in step 6.
 
 Parse each commit for:
 - **Type** (`feat`, `fix`, `docs`, etc.) from the conventional commit prefix
