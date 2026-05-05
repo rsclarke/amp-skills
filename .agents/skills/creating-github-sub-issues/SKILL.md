@@ -66,49 +66,8 @@ done
 
   Confirm it lists every expected child number. Skip this check for ≤2 children — the per-call 2xx is sufficient.
 
-## API Reference
+## Notes
 
-### Add Sub-Issue
-
-```
-POST /repos/{owner}/{repo}/issues/{issue_number}/sub_issues
-```
-
-Request body:
-```json
-{
-  "sub_issue_id": 123456789,
-  "replace_parent": false
-}
-```
-
-- `sub_issue_id` (required): The numeric ID of the issue to add as sub-issue
-- `replace_parent` (optional): If true, replaces the sub-issue's current parent
-
-### List Sub-Issues
-
-```bash
-gh api repos/OWNER/REPO/issues/27/sub_issues
-```
-
-### Remove Sub-Issue
-
-```
-DELETE /repos/{owner}/{repo}/issues/{issue_number}/sub_issues/{sub_issue_id}
-```
-
-### Get Parent Issue
-
-```bash
-gh api repos/OWNER/REPO/issues/28/parent
-```
-
-## Important Notes
-
-- Sub-issues must belong to the same repository owner as the parent
-- Up to 100 sub-issues per parent issue
-- Up to 8 levels of nested sub-issues
-- The deprecated `[tasklist]` markdown syntax does not create proper parent-child relationships
-- Issue IDs are different from issue numbers; use the API to get the ID
-- Do not add `Parent issue: #...` in sub-issue bodies when using the API relationship; GitHub already shows the parent in the UI
-- Do not maintain sub-issue checklists or ID lists in the parent body; linked sub-issues are already shown in the parent
+- Do not add `Parent issue: #...` in sub-issue bodies — GitHub already shows the parent in the UI when the API relationship exists.
+- Do not maintain sub-issue checklists or ID lists in the parent body — linked sub-issues are already shown in the parent.
+- For inspection, removal, or other endpoints (List / Remove / Get Parent), see [`reference/sub-issues-api.md`](reference/sub-issues-api.md).
