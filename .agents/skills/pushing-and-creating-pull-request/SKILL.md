@@ -81,17 +81,13 @@ Rules:
 
 ### 6. Push and Create the PR
 
+Pipe the body via heredoc to `--body-file -` to avoid shell-escaping pitfalls with backticks, quotes, and `$`:
+
 ```bash
 git push -u origin HEAD
-gh pr create --title "<title>" --body "<body>"
+gh pr create --title "<title>" --body-file - <<'EOF'
+<body>
+EOF
 ```
 
-Escape special characters in `--body` for the shell.
-
-## Conventional Commit Type to PR Title Mapping
-
-- All `feat` → `feat:`
-- All `fix` → `fix:`
-- All `docs` → `docs:`
-- All `chore` → `chore:`
-- Mixed types → prefix of the primary type
+For non-default base branches, add `--base <branch>`. Capture the PR URL printed by `gh pr create` and return it to the user.
