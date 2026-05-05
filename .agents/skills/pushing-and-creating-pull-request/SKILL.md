@@ -15,9 +15,7 @@ Pushes the current branch to the remote and creates a pull request with a well-s
 
 ### 1. Preflight
 
-If a calling skill already verified state in this run, skip.
-
-Otherwise:
+Always run preflight here — state changes between when a coordinator started and when this skill pushes.
 
 ```bash
 git status --short --branch
@@ -32,11 +30,14 @@ Also confirm the current branch is **not** the default branch before pushing.
 
 ### 2. Gather Commit History
 
-Collect all commits on the branch that are ahead of the base branch:
+Resolve the base branch dynamically (defaults to `origin/main` if `origin/HEAD` is unset) and collect commits ahead of it:
 
 ```bash
-git log origin/main..HEAD --reverse --format="%h %s%n%n%b"
+BASE=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null || echo origin/main)
+git log "$BASE"..HEAD --reverse --format="%h %s%n%n%b"
 ```
+
+Reuse `$BASE` for any later range queries. For PRs targeting a non-default base, the caller should specify it explicitly via `gh pr create --base <branch>` in step 6.
 
 Parse each commit for:
 - **Type** (`feat`, `fix`, `docs`, etc.) from the conventional commit prefix

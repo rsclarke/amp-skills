@@ -31,11 +31,18 @@ git status --short --branch
 
 ### 2. Switch to the Up-to-Date Default Branch
 
+Resolve the default branch via `origin/HEAD`, falling back to `main`:
+
 ```bash
-git fetch origin && git checkout "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || echo main)" && git pull --ff-only
+git fetch origin
+DEFAULT=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null)
+DEFAULT=${DEFAULT#origin/}
+DEFAULT=${DEFAULT:-main}
+git checkout "$DEFAULT"
+git pull --ff-only
 ```
 
-If `origin/HEAD` is not set, run `git remote set-head origin --auto` once before retrying.
+If `origin/HEAD` is unset, run `git remote set-head origin --auto` once before retrying.
 
 If the user explicitly asks to branch from a different base, skip this step.
 

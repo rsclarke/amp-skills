@@ -16,7 +16,7 @@ Creates Git commits that follow the [Conventional Commits 1.0.0](https://www.con
 
 ### 1. Preflight
 
-If a calling skill already verified state in this run, skip the `git status --short --branch` invocation but still apply the untracked-file rule in §2.
+Always run preflight here — state changes between when a coordinator started and when this skill commits.
 
 ```bash
 git status --short --branch
