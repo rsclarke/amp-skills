@@ -32,7 +32,7 @@ git status --short --branch
 ### 2. Switch to the Up-to-Date Default Branch
 
 ```bash
-git fetch origin && git checkout $(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null || echo main) && git pull --ff-only
+git fetch origin && git checkout "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || echo main)" && git pull --ff-only
 ```
 
 If `origin/HEAD` is not set, run `git remote set-head origin --auto` once before retrying.
