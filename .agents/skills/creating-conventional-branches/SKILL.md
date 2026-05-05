@@ -16,9 +16,7 @@ Creates a new Git branch using the [Conventional Branch](https://conventional-br
 
 ### 1. Preflight
 
-If a calling skill already verified state in this run, skip.
-
-Otherwise:
+Skip the `git status` call only when a coordinator preflighted **immediately before** invoking this skill **and no file-changing step has run since**. Otherwise:
 
 ```bash
 git status --short --branch
@@ -31,11 +29,18 @@ git status --short --branch
 
 ### 2. Switch to the Up-to-Date Default Branch
 
+Resolve the default branch via `origin/HEAD`, falling back to `main`:
+
 ```bash
-git fetch origin && git checkout "$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || echo main)" && git pull --ff-only
+git fetch origin
+DEFAULT=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null)
+DEFAULT=${DEFAULT#origin/}
+DEFAULT=${DEFAULT:-main}
+git checkout "$DEFAULT"
+git pull --ff-only
 ```
 
-If `origin/HEAD` is not set, run `git remote set-head origin --auto` once before retrying.
+If `origin/HEAD` is unset, run `git remote set-head origin --auto` once before retrying.
 
 If the user explicitly asks to branch from a different base, skip this step.
 
@@ -48,16 +53,11 @@ Collect:
 
 ### 4. Select Branch Prefix
 
-Use this mapping:
-
-- `enhancement`, `feature`, `feat` → `feat/`
-- `bug`, `defect` → `fix/`
-- `critical`, `urgent`, `hotfix` → `hotfix/`
-- `documentation`, `docs` → `chore/`
-- `dependencies`, `deps` → `chore/`
-- `chore`, `maintenance` → `chore/`
-- `release` → `release/`
-- (no matching signals) → `feat/`
+- `fix/` — bugs, defects
+- `hotfix/` — critical or urgent production fixes
+- `chore/` — docs, dependencies, tooling, maintenance
+- `release/` — release branches
+- `feat/` — everything else (default, including new features and enhancements)
 
 ### 5. Build the Description Slug
 

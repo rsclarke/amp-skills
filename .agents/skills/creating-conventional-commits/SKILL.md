@@ -16,7 +16,7 @@ Creates Git commits that follow the [Conventional Commits 1.0.0](https://www.con
 
 ### 1. Preflight
 
-If a calling skill already verified state in this run, skip the `git status --short --branch` invocation but still apply the untracked-file rule in §2.
+Always run preflight here — state changes between when a coordinator started and when this skill commits.
 
 ```bash
 git status --short --branch
@@ -43,15 +43,7 @@ git add <intended untracked files only>
 
 ### 3. Choose the Commit Type
 
-Use these conventional types based on intent:
-
-- `feat` — new user-facing behavior
-- `fix` — bug fix or regression fix
-- `docs` — documentation-only update
-- `style` — formatting-only (no logic change)
-- `refactor` — internal restructuring without behavior change
-- `test` — test additions or test-only updates
-- `chore` — tooling, maintenance, or dependency work
+Use the standard Conventional Commits types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`. Pick by intent (new behavior, bug fix, docs-only, formatting-only, internal restructure, test-only, tooling/maintenance).
 
 ### 4. Compose the Commit Message
 

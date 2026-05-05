@@ -15,9 +15,7 @@ Pushes the current branch to the remote and creates a pull request with a well-s
 
 ### 1. Preflight
 
-If a calling skill already verified state in this run, skip.
-
-Otherwise:
+Always run preflight here — state changes between when a coordinator started and when this skill pushes.
 
 ```bash
 git status --short --branch
@@ -28,15 +26,28 @@ git status --short --branch
 - **Any `M A D R C`** — stop; commit (via `creating-conventional-commits`) or stash before pushing
 - **Any `U` / `AA` / `DD`** — stop; resolve before pushing
 
-Also confirm the current branch is **not** the default branch before pushing.
+Resolve the default branch and confirm the current branch is not it:
+
+```bash
+DEFAULT=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null)
+DEFAULT=${DEFAULT#origin/}
+DEFAULT=${DEFAULT:-main}
+CURRENT=$(git symbolic-ref --short HEAD)
+[ "$CURRENT" != "$DEFAULT" ] || { echo "Refusing to push from default branch ($CURRENT)"; exit 1; }
+```
+
+If `origin/HEAD` is unset (e.g., on manually-added remotes or after a default-branch rename), run `git remote set-head origin --auto` once before retrying — the silent `main` fallback may otherwise produce a wrong-base PR.
 
 ### 2. Gather Commit History
 
-Collect all commits on the branch that are ahead of the base branch:
+Reuse `$DEFAULT` from step 1 to collect commits ahead of the base branch:
 
 ```bash
-git log origin/main..HEAD --reverse --format="%h %s%n%n%b"
+BASE="origin/$DEFAULT"
+git log "$BASE"..HEAD --reverse --format="%h %s%n%n%b"
 ```
+
+For PRs targeting a non-default base, the caller should specify it explicitly via `gh pr create --base <branch>` in step 6.
 
 Parse each commit for:
 - **Type** (`feat`, `fix`, `docs`, etc.) from the conventional commit prefix
@@ -80,17 +91,13 @@ Rules:
 
 ### 6. Push and Create the PR
 
+Pipe the body via heredoc to `--body-file -` to avoid shell-escaping pitfalls with backticks, quotes, and `$`:
+
 ```bash
 git push -u origin HEAD
-gh pr create --title "<title>" --body "<body>"
+gh pr create --title "<title>" --body-file - <<'EOF'
+<body>
+EOF
 ```
 
-Escape special characters in `--body` for the shell.
-
-## Conventional Commit Type to PR Title Mapping
-
-- All `feat` → `feat:`
-- All `fix` → `fix:`
-- All `docs` → `docs:`
-- All `chore` → `chore:`
-- Mixed types → prefix of the primary type
+For non-default base branches, add `--base <branch>`. Capture the PR URL printed by `gh pr create` and return it to the user.
