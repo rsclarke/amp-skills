@@ -55,6 +55,17 @@ for issue_num in 28 29 30 31; do
 done
 ```
 
+## Done when
+
+- Every `POST .../sub_issues` returned 2xx (the response body includes the linked sub-issue).
+- For batches of 3+ children or any suspected failure, run one verification call:
+
+  ```bash
+  gh api repos/OWNER/REPO/issues/PARENT/sub_issues --jq '[.[].number]'
+  ```
+
+  Confirm it lists every expected child number. Skip this check for ≤2 children — the per-call 2xx is sufficient.
+
 ## API Reference
 
 ### Add Sub-Issue
