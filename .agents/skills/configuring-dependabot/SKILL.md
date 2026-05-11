@@ -67,11 +67,17 @@ For each ecosystem, also note the *locations* of its manifests so you can pick `
 
 For every ecosystem found, decide the four key settings before writing YAML.
 
-**`directory` vs `directories`:**
-- Single manifest at the root (or a build tool that aggregates from root, e.g. Maven reactor, Gradle multi-project, Cargo workspace, Go module): use `directory: "/"`.
-- Independent sub-projects each with their own manifest (e.g. several Dockerfiles, npm workspaces with no root lockfile, multiple Terraform stacks): use `directories: [...]`.
-- Prefer a single `updates` entry with `directories: [...]` over multiple entries for the same ecosystem/target-branch when the policy is identical — this enables `group-by: dependency-name` and avoids overlap errors.
+**`directory` vs `directories` vs multiple entries:**
+
+Think in terms of **cohorts** — sets of manifests that share a dependency profile (same framework family, same vendor mix, same upgrade cadence). The shape of the YAML follows the cohort structure, not the ecosystem.
+
+- **One manifest, or a build tool that aggregates from root** (Maven reactor, Gradle multi-project, Cargo workspace, single Go module): one entry, `directory: "/"`.
+- **Independent sub-projects with the same dependency profile** (e.g. three Dockerfiles all running Alpine + Python, npm workspaces sharing the same React/Vite stack, Terraform stacks all on the same providers): one entry, `directories: [...]`, with `group-by: dependency-name` on shared groups so a single PR updates a dep everywhere.
+- **Independent sub-projects with distinct dependency profiles** (e.g. a standalone Lambda alongside Spring Boot services, a CLI alongside a Next.js app, a legacy Python 2 service alongside modern uv-based ones): **one entry per cohort**, each with `directories: [...]` listing only that cohort's paths and `groups` tailored to its actual dependencies. This prevents one cohort's families from being silently masked by another's union and keeps each block's groups auditable against its own manifests.
+- **Totally heterogeneous sub-projects** (every directory is its own world): one entry per directory.
 - For `github-actions`, always use `directory: "/"` (Dependabot scans `.github/workflows/` automatically).
+
+To identify cohorts, after enumerating dependencies per manifest (see Step 3 `groups` below), cluster manifests whose dependency sets overlap heavily — shared parent POM, shared framework, shared vendor — into the same cohort. Manifests with disjoint stacks belong in separate cohorts. Multiple `updates` entries for the same ecosystem are allowed provided their directories don't overlap within a target-branch.
 
 **`schedule.interval`:** default to `weekly`. Use `daily` only if the user asks. Use `monthly` only when the repo is clearly low-touch or the user explicitly wants lower churn (avoid for security-sensitive ecosystems).
 
@@ -87,7 +93,20 @@ cooldown:
 
 Increase `semver-major-days` (e.g. `14`) for risk-averse projects. `cooldown` applies only to version updates, not security updates, so it never delays vulnerability fixes.
 
-**`groups`:** the goal is to bundle dependencies that move together (same vendor, same framework, related plugins) into one PR so reviewers see a coherent change. Derive groups from the actual manifests — read the dependency list and identify clusters by shared name prefix, organisation, or known framework family.
+**`groups`:** the goal is to bundle dependencies that move together (same vendor, same framework, related plugins) into one PR so reviewers see a coherent change. Derive groups from the actual manifests — never from memory or assumption.
+
+Before naming any group, **enumerate dependencies from every manifest of that ecosystem**, not just the one at the repo root. Skipping sub-project manifests is the most common source of missed groups (e.g. a non-aggregating root `pom.xml` whose sibling modules inherit from `spring-boot-starter-parent`, or a workspace where each package has its own dependencies). For each manifest:
+
+- Read the file and list every direct dependency (runtime, dev, test, build).
+- Inspect **inherited and indirect declarations** that imply a family but may not appear as a normal dependency:
+  - Maven: `<parent>` (e.g. `spring-boot-starter-parent`), `<dependencyManagement>` BOM imports, `<build><plugins>`, `<pluginManagement>`.
+  - Gradle: `plugins { ... }` block, `platform(...)` / BOM imports, `buildscript` classpath.
+  - npm/bun: `peerDependencies`, `devDependencies`, workspace package manifests, framework presets in `eslint`/`babel`/`vite` config.
+  - Python: `[tool.poetry.group.*]`, optional-dependency extras, `[build-system].requires`.
+  - Cargo: workspace member `Cargo.toml` files, `[build-dependencies]`, `[dev-dependencies]`.
+  - Go: indirect modules in `go.mod` that share an org prefix (e.g. `k8s.io/*`, `go.opentelemetry.io/*`).
+  - GitHub Actions: every `uses:` line across all workflow files.
+- Aggregate the union across manifests, then identify clusters by shared name prefix, organisation, or known framework family. A cluster found in *any* manifest warrants a group, even if absent from the root.
 
 Dependabot assigns each dependency to the **first** matching group, so order groups narrowest → broadest:
 1. Framework/family groups first, one per cluster you identified.
@@ -134,6 +153,8 @@ Confirm:
 - No two entries for the same ecosystem and target-branch overlap on directories.
 - `package-ecosystem` values are spelled exactly as in the reference list above (e.g. `gomod`, not `go`; `gitsubmodule`, not `git-submodule`).
 - Family `groups` precede the `minor-and-patch` fallback in each entry (first match wins).
+- For every ecosystem with `directories: [...]`, you read each listed manifest (including parent/BOM/plugin sections) and the family groups reflect the union of clusters across them.
+- Where sub-projects have distinct dependency profiles, they are split into separate `updates` entries (cohorts), and each cohort's `groups` only references families actually present in its own manifests (no dead patterns, no missed families).
 
 ## Done when
 
