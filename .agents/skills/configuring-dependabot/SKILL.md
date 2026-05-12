@@ -94,7 +94,13 @@ Raise `default-days` (e.g. `14`) for risk-averse projects. `cooldown` applies on
 
 Do not emit `semver-major-days`, `semver-minor-days`, or `semver-patch-days`. They are only accepted by SemVer-aware ecosystems and fail validation on the others (`bazel`, `devcontainers`, `docker`, `docker-compose`, `github-actions`, `gitsubmodule`, `helm`, `terraform`) with `The property '#/updates/N/cooldown/semver-*-days' is not supported for the package ecosystem '<name>'`. Only add them if the user explicitly asks for per-bump-type cooldowns, and then only on SemVer ecosystems.
 
-**`groups`:** the goal is to bundle dependencies that move together (same vendor, same framework, related plugins) into one PR so reviewers see a coherent change. Derive groups from the actual manifests — never from memory or assumption.
+**`groups`:** the goal is to bundle dependencies that **must move in lockstep** (same vendor's coordinated release train, framework + its plugins, packages that share an internal API) into one PR so reviewers see a coherent change. Derive groups from the actual manifests — never from memory or assumption.
+
+A group must justify itself by **lockstep risk**, not by shared namespace. Two packages under `hashicorp/*` that are unrelated do not need a group. One package alone under a namespace never needs a group — it would be a group of one, which adds noise (extra group name in the PR title, extra block in the YAML) without bundling anything. Concretely:
+
+- **Minimum 2 distinct packages** in the group, counted by package name (not version). `actions/checkout@v5` and `actions/checkout@v6` are one package.
+- **Coordinated release or shared API** — Spring Boot starters, AWS SDK v2 modules, OpenTelemetry SDK + instrumentation, React + React DOM, a monorepo's own `@scope/*` packages, a vendor's CLI + matching action. If two packages under the same namespace release independently and have no shared surface (e.g. `slackapi/slack-github-action` vs a hypothetical unrelated `slackapi/*` action), do not group them.
+- **When in doubt, leave it out** — let it fall into the `minor-and-patch` catch-all. A missing group costs one extra PR; a wrong group hides unrelated changes behind one title.
 
 Before naming any group, **enumerate dependencies from every manifest of that ecosystem**, not just the one at the repo root. Skipping sub-project manifests is the most common source of missed groups (e.g. a non-aggregating root `pom.xml` whose sibling modules inherit from `spring-boot-starter-parent`, or a workspace where each package has its own dependencies). For each manifest:
 
@@ -110,7 +116,7 @@ Before naming any group, **enumerate dependencies from every manifest of that ec
 - Aggregate the union across manifests, then identify clusters by shared name prefix, organisation, or known framework family. A cluster found in *any* manifest warrants a group, even if absent from the root.
 
 Dependabot assigns each dependency to the **first** matching group, so order groups narrowest → broadest:
-1. Framework/family groups first, one per cluster you identified.
+1. Framework/family groups first, one per cluster you identified **that has 2+ distinct packages with lockstep risk**. Drop any cluster that resolves to a single package — let it fall through to the catch-all.
 2. A catch-all `minor-and-patch` group with `update-types: ["minor", "patch"]` last, as the low-risk fallback.
 
 `reference/family-groups.md` shows illustrative patterns for common ecosystems (Spring, React, AWS SDK, etc.) — use it for shape and naming inspiration, not as an exhaustive list. Most repos will have project-specific clusters not covered there; invent group names and patterns to fit what is in the manifests.
@@ -155,6 +161,7 @@ Confirm:
 - Family `groups` precede the `minor-and-patch` fallback in each entry (first match wins).
 - For every ecosystem with `directories: [...]`, you read each listed manifest (including parent/BOM/plugin sections) and the family groups reflect the union of clusters across them.
 - Where sub-projects have distinct dependency profiles, they are split into separate `updates` entries (cohorts), and each cohort's `groups` only references families actually present in its own manifests (no dead patterns, no missed families).
+- Every named family group has **at least 2 distinct packages** matching its patterns in the actual manifests, and those packages share a lockstep release/API relationship. Single-package "groups" (e.g. one action under a namespace) have been removed so the dependency falls into `minor-and-patch`.
 - `cooldown` blocks use `default-days` only, unless the user explicitly asked for per-bump-type cooldowns on a SemVer-aware ecosystem.
 
 ## Done when
