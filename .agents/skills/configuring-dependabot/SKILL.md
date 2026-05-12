@@ -83,15 +83,16 @@ To identify cohorts, after enumerating dependencies per manifest (see Step 3 `gr
 
 **`open-pull-requests-limit`:** default `5` (matches GitHub's own default and keeps noise down). Raise to `10` only when the user wants faster update throughput; omit the key entirely if you have no reason to deviate.
 
-**`cooldown`:** always set a small cooldown so freshly-released versions get a chance to settle before Dependabot opens a PR. Sensible defaults:
+**`cooldown`:** always set a small cooldown so freshly-released versions get a chance to settle before Dependabot opens a PR. Use `default-days` only — it is the one cooldown key accepted by every package ecosystem:
 
 ```yaml
 cooldown:
-  default-days: 3
-  semver-major-days: 7
+  default-days: 7
 ```
 
-Increase `semver-major-days` (e.g. `14`) for risk-averse projects. `cooldown` applies only to version updates, not security updates, so it never delays vulnerability fixes.
+Raise `default-days` (e.g. `14`) for risk-averse projects. `cooldown` applies only to version updates, not security updates, so it never delays vulnerability fixes.
+
+Do not emit `semver-major-days`, `semver-minor-days`, or `semver-patch-days`. They are only accepted by SemVer-aware ecosystems and fail validation on the others (`bazel`, `devcontainers`, `docker`, `docker-compose`, `github-actions`, `gitsubmodule`, `helm`, `terraform`) with `The property '#/updates/N/cooldown/semver-*-days' is not supported for the package ecosystem '<name>'`. Only add them if the user explicitly asks for per-bump-type cooldowns, and then only on SemVer ecosystems.
 
 **`groups`:** the goal is to bundle dependencies that move together (same vendor, same framework, related plugins) into one PR so reviewers see a coherent change. Derive groups from the actual manifests — never from memory or assumption.
 
@@ -129,8 +130,7 @@ Order each `updates` entry consistently for readability. Place specific family g
     interval: "weekly"
   open-pull-requests-limit: 5
   cooldown:
-    default-days: 3
-    semver-major-days: 7
+    default-days: 7
   groups:
     # specific families first (narrowest → broadest)
     spring-boot:
@@ -155,6 +155,7 @@ Confirm:
 - Family `groups` precede the `minor-and-patch` fallback in each entry (first match wins).
 - For every ecosystem with `directories: [...]`, you read each listed manifest (including parent/BOM/plugin sections) and the family groups reflect the union of clusters across them.
 - Where sub-projects have distinct dependency profiles, they are split into separate `updates` entries (cohorts), and each cohort's `groups` only references families actually present in its own manifests (no dead patterns, no missed families).
+- `cooldown` blocks use `default-days` only, unless the user explicitly asked for per-bump-type cooldowns on a SemVer-aware ecosystem.
 
 ## Done when
 
