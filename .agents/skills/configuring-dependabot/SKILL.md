@@ -100,7 +100,7 @@ A group must justify itself by **lockstep risk**, not by shared namespace. Two p
 
 - **Minimum 2 distinct packages** in the group, counted by package name (not version). `actions/checkout@v5` and `actions/checkout@v6` are one package.
 - **Coordinated release or shared API** — Spring Boot starters, AWS SDK v2 modules, OpenTelemetry SDK + instrumentation, React + React DOM, a monorepo's own `@scope/*` packages, a vendor's CLI + matching action. If two packages under the same namespace release independently and have no shared surface (e.g. `slackapi/slack-github-action` vs a hypothetical unrelated `slackapi/*` action), do not group them.
-- **When in doubt, leave it out** — let it fall into the `minor-and-patch` catch-all. A missing group costs one extra PR; a wrong group hides unrelated changes behind one title.
+- **When in doubt, leave it out** — let Dependabot open separate PRs. A missing group costs one extra PR; a wrong group hides unrelated changes behind one title.
 
 Before naming any group, **enumerate dependencies from every manifest of that ecosystem**, not just the one at the repo root. Skipping sub-project manifests is the most common source of missed groups (e.g. a non-aggregating root `pom.xml` whose sibling modules inherit from `spring-boot-starter-parent`, or a workspace where each package has its own dependencies). For each manifest:
 
@@ -116,8 +116,8 @@ Before naming any group, **enumerate dependencies from every manifest of that ec
 - Aggregate the union across manifests, then identify clusters by shared name prefix, organisation, or known framework family. A cluster found in *any* manifest warrants a group, even if absent from the root.
 
 Dependabot assigns each dependency to the **first** matching group, so order groups narrowest → broadest:
-1. Framework/family groups first, one per cluster you identified **that has 2+ distinct packages with lockstep risk**. Drop any cluster that resolves to a single package — let it fall through to the catch-all.
-2. A catch-all `minor-and-patch` group with `update-types: ["minor", "patch"]` last, as the low-risk fallback.
+1. Framework/family groups first, one per cluster you identified **that has 2+ distinct packages with lockstep risk**.
+2. Drop any cluster that resolves to a single package — leave it ungrouped.
 
 `reference/family-groups.md` shows illustrative patterns for common ecosystems (Spring, React, AWS SDK, etc.) — use it for shape and naming inspiration, not as an exhaustive list. Most repos will have project-specific clusters not covered there; invent group names and patterns to fit what is in the manifests.
 
@@ -127,7 +127,7 @@ Leave `major` updates ungrouped so breaking changes are reviewed individually. W
 
 Write to `.github/dependabot.yml`. Required top-level keys: `version: 2` and `updates:`.
 
-Order each `updates` entry consistently for readability. Place specific family groups first and the `minor-and-patch` fallback last:
+Order each `updates` entry consistently for readability. If there are justified family groups, place them narrowest → broadest:
 
 ```yaml
 - package-ecosystem: "<ecosystem>"
@@ -138,12 +138,8 @@ Order each `updates` entry consistently for readability. Place specific family g
   cooldown:
     default-days: 7
   groups:
-    # specific families first (narrowest → broadest)
     spring-boot:
       patterns: ["org.springframework*"]
-    # fallback last
-    minor-and-patch:
-      update-types: ["minor", "patch"]
 ```
 
 Only add optional keys (`labels`, `assignees`, `reviewers`, `commit-message`, `versioning-strategy`, `target-branch`, `ignore`, `allow`, `registries`, `milestone`, `rebase-strategy`, `vendor`, `exclude-paths`, `pull-request-branch-name`, `insecure-external-code-execution`, `multi-ecosystem-groups`) when the user asks or the existing file already uses them — do not invent policy. Skip `enable-beta-ecosystems` (currently has no effect per the GitHub docs).
@@ -158,14 +154,14 @@ Confirm:
 - Each ecosystem listed actually has a matching manifest in the repo.
 - No two entries for the same ecosystem and target-branch overlap on directories.
 - `package-ecosystem` values are spelled exactly as in the reference list above (e.g. `gomod`, not `go`; `gitsubmodule`, not `git-submodule`).
-- Family `groups` precede the `minor-and-patch` fallback in each entry (first match wins).
+- Family `groups` are ordered narrowest → broadest in each entry (first match wins).
 - For every ecosystem with `directories: [...]`, you read each listed manifest (including parent/BOM/plugin sections) and the family groups reflect the union of clusters across them.
 - Where sub-projects have distinct dependency profiles, they are split into separate `updates` entries (cohorts), and each cohort's `groups` only references families actually present in its own manifests (no dead patterns, no missed families).
-- Every named family group has **at least 2 distinct packages** matching its patterns in the actual manifests, and those packages share a lockstep release/API relationship. Single-package "groups" (e.g. one action under a namespace) have been removed so the dependency falls into `minor-and-patch`.
+- Every named family group has **at least 2 distinct packages** matching its patterns in the actual manifests, and those packages share a lockstep release/API relationship. Single-package "groups" (e.g. one action under a namespace) have been removed so the dependency remains ungrouped.
 - `cooldown` blocks use `default-days` only, unless the user explicitly asked for per-bump-type cooldowns on a SemVer-aware ecosystem.
 
 ## Done when
 
 - `.github/dependabot.yml` exists and parses as YAML.
-- Every detected ecosystem the user wants managed is configured with directory, schedule, PR limit, and grouping.
+- Every detected ecosystem the user wants managed is configured with directory, schedule, PR limit, and any justified grouping.
 - Custom user settings from any pre-existing file are preserved.
