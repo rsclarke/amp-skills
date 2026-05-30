@@ -179,7 +179,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      security-events: write
+      security-events: write # Required for zizmor-action to upload SARIF to GitHub code scanning.
     steps:
       - name: Checkout repository
         uses: actions/checkout@<pinned-sha>
