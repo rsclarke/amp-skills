@@ -168,8 +168,12 @@ name: Run zizmor
 
 on:
   pull_request:
+    paths:
+      - .github/**
   push:
     branches: [main]
+    paths:
+      - .github/**
 
 permissions: {}
 
@@ -196,13 +200,18 @@ jobs:
 
 Adapt the workflow to the repository:
 
+- Choose the trigger paths from the action inventory in step 2:
+  - For a typical application repository whose audited files are all under `.github/`, keep the `.github/**` path filters so unrelated changes do not run `zizmor`.
+  - If the repository's primary product is a GitHub Action, including a composite action, remove both `paths` filters so all pull requests and default-branch pushes run `zizmor`.
+  - If the repository contains nested action manifests outside `.github/` but is not primarily an action repository, add `'**/action.yml'` and `'**/action.yaml'` to both `paths` lists.
+  - If this workflow will be a required status check, remove both `paths` filters; GitHub can leave path-filtered required workflows pending on unrelated pull requests and block merging.
 - Replace `<pinned-sha>` with immutable commit SHAs. If the repo does not pin actions elsewhere and the user prefers version tags, follow existing policy but note the trade-off.
 - Keep `permissions: {}` at the workflow level and grant only the job permissions required.
 - Keep the top-level `concurrency` block so repeated pushes cancel stale runs and `zizmor` does not report `concurrency-limits` on the newly added workflow.
 - By default, `zizmor-action` uploads SARIF to GitHub code scanning, which requires `security-events: write`; keep the inline comment on that permission so `zizmor` does not report `undocumented-permissions` on the newly added workflow.
 - For private or internal repositories using the default Advanced Security mode, add `actions: read`; `contents: read` is already present in the baseline.
 - If the repo cannot use GitHub Advanced Security/code scanning, remove `security-events: write` and set `advanced-security: false` on the `zizmor-action` step.
-- Include `pull_request` and default-branch `push` triggers unless the project has a different CI trigger policy.
+- Include `pull_request` and default-branch `push` triggers unless the project has a different CI trigger policy; adapt only their path filters using the rules above.
 
 Verify the new workflow and then run the full audit again:
 
